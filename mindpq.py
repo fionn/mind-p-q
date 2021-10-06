@@ -7,6 +7,8 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Util.number import isPrime as is_prime
 
+from batch_gcd import batch_gcd
+
 
 def import_keys() -> list[RSA.RsaKey]:
     """Load public keys"""
@@ -18,21 +20,33 @@ def import_keys() -> list[RSA.RsaKey]:
 
 
 def factor(moduli: list[int]) -> list[tuple[int, int]]:
-    """Factorise moduli via pairwise GCD, returned at the same index"""
-    factors: list[tuple[int, int]] = [None] * len(moduli)
-    for i, n_i in enumerate(moduli):
-        for j, n_j in enumerate(moduli[i + 1:], start=i + 1):
-            p = gcd(n_i, n_j)
-            if p > 1:
-                assert is_prime(p), p
-                q_i, q_j  = n_i // p, n_j // p
-                assert is_prime(q_i), q_i
-                factors[i] = (p, q_i)
-                assert is_prime(q_j), q_j
-                factors[j] = (p, q_j)
-        if not factors[i]:
-            raise RuntimeError(f"Failed to factorise modulus at index {i}")
+    """Factorise moduli via batch GCD, returned at the same index"""
+    factors: list[tuple[int, int]] = []
+    gs = batch_gcd(moduli)
+    for n, p in zip(moduli, gs):
+        if p == 1:
+            raise RuntimeError(f"Failed to factorise modulus {n}")
+        if p < n:
+            assert is_prime(p), p
+            factors.append((p, n // p))
+        elif p == n:
+            factors.append(pairwise_gcd(n, moduli))
+        else:
+            raise RuntimeError("Batch GCD error")
+
     return factors
+
+
+def pairwise_gcd(n: int, moduli: list[int]) -> tuple[int, int]:
+    """Factorise n if it shares factors with any modulus"""
+    for n_j in moduli:
+        p = gcd(n, n_j)
+        if 1 < p < n:
+            q = n // p
+            assert is_prime(p), p
+            assert is_prime(q), q
+            return (p, q)
+    raise RuntimeError(f"Failed to factorise modulus {n}")
 
 
 def construct_private_key(e: int, p: int, q: int) -> RSA.RsaKey:
