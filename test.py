@@ -68,9 +68,10 @@ class TestMindPQ(unittest.TestCase):
         """Run through the whole attack"""
         public_keys = mindpq.import_keys()
 
+        # Assert that all keys have the same exponent.
         self.assertEqual(len(set(key.e for key in public_keys)), 1)
 
-        # Factorise moduli and get corresponding private keys
+        # Factorise moduli and get corresponding private keys.
         factors = mindpq.factor([key.n for key in public_keys])
         keys = mindpq.construct_private_keys(public_keys[0].e, factors)
 

@@ -58,12 +58,7 @@ def construct_private_key(e: int, p: int, q: int) -> RSA.RsaKey:
 def construct_private_keys(e: int,
                            factors: list[tuple[int, int]]) -> list[RSA.RsaKey]:
     """Bulk private key creation"""
-    keys = []
-    for p_q in factors:
-        private_key = construct_private_key(e, *p_q)
-        keys.append(private_key)
-
-    return keys
+    return [construct_private_key(e, *p_q) for p_q in factors]
 
 
 def decrypt(private_key: RSA.RsaKey, ciphertext: bytes) -> bytes:
@@ -78,7 +73,7 @@ def decrypt_all(keys: list[RSA.RsaKey]) -> bytes:
     for i, key in enumerate(keys):
         with open(f"data/{i}.enc", "rb") as fd:
             ciphertext = fd.read()
-            message += decrypt(key, ciphertext)
+        message += decrypt(key, ciphertext)
     return message
 
 
@@ -89,7 +84,7 @@ def main() -> None:
     # Ensure all keys have the same exponent.
     assert len(set(key.e for key in public_keys)) == 1
 
-    # Factorise moduli and get corresponding private keys
+    # Factorise moduli and get corresponding private keys.
     factors = factor([key.n for key in public_keys])
     keys = construct_private_keys(public_keys[0].e, factors)
 
