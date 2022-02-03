@@ -32,3 +32,6 @@ jobs:
 
     - name: Test
       run: python -m unittest -v --locals --buffer
+
+    - name: Run
+      run: ./mindpq.py > /dev/null && echo $?
