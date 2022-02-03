@@ -5,6 +5,7 @@ exclude_lines =
     def main
     raise AssertionError
     raise NotImplementedError
+    raise RuntimeError
     pass
     self.fail
     if __name__ == .__main__.:
