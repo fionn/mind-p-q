@@ -1,2 +1,2 @@
-pycryptodome == 3.14.0
+pycryptodome == 3.14.1
 git+https://github.com/fionn/batch-gcd@0.0.1#egg=batch-gcd
