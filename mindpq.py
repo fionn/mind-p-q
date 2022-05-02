@@ -22,7 +22,7 @@ def import_keys() -> list[RSA.RsaKey]:
 def factor(moduli: list[int]) -> list[tuple[int, int]]:
     """Factorise moduli via batch GCD, returned at the same index"""
     factors: list[tuple[int, int]] = []
-    gs = batch_gcd(moduli)
+    gs = batch_gcd(*moduli)
     for n, p in zip(moduli, gs):
         if p == 1:
             raise RuntimeError(f"Failed to factorise modulus {n}")
