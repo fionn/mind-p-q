@@ -1,2 +1,2 @@
-pycryptodome == 3.14.1
+pycryptodome == 3.19.1
 batch-gcd == 0.0.3
